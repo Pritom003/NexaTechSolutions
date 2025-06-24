@@ -28,17 +28,17 @@ const Navbar = () => {
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className=" sm:flex hidden bg-black px-4 py-2 
+        className=" md:flex hidden bg-black px-4 py-2 
           text-white border border-white rounded-full items-center md:px-6 space-x-6"
       >
         <Link href="/" className="hover:underline">Home</Link>
         <Link href="/about" className="hover:underline">About</Link>
-        <Link href="/services" className="hover:underline">Services</Link>
+        <Link href="/dashboard" className="hover:underline">dashboard</Link>
         <Link href="/contact" className="hover:underline">Contact</Link>
       </motion.div>
 
       {/* Mobile Burger Icon */}
-      <div className="sm:hidden">
+      <div className="md:hidden">
         <button onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X className="text-white" /> : <Menu className="text-white" />}
         </button>
@@ -56,7 +56,7 @@ const Navbar = () => {
           >
             <Link href="/" onClick={() => setIsOpen(false)} className="hover:underline">Home</Link>
             <Link href="/about" onClick={() => setIsOpen(false)} className="hover:underline">About</Link>
-            <Link href="/services" onClick={() => setIsOpen(false)} className="hover:underline">Services</Link>
+            <Link href="/dashboard" onClick={() => setIsOpen(false)} className="hover:underline">dashboard</Link>
             <Link href="/contact" onClick={() => setIsOpen(false)} className="hover:underline">Contact</Link>
           </motion.div>
         )}
