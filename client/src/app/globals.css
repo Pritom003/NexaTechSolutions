@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .animate-dotPattern {
+    background-image: radial-gradient(#ffffff11 1px, transparent 1px);
+    background-size: 20px 20px;
+    animation: moveDots 8s linear infinite;
+  }
+
+  @keyframes moveDots {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 20px 20px;
+    }
+  }
+}
