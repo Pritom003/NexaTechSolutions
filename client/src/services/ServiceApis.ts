@@ -1,34 +1,39 @@
 
-import { getValidToken } from "../../lib/verifyToken";
-const API_BASE = 'https://nexa-tech-server.vercel.app/api/v1/banners';
+// import { getValidToken } from "@/app/lib/verifyToken";
 
-export interface BannerData {
+import { getValidToken } from "../../lib/verifyToken";
+
+
+
+const API_BASE = 'https://nexa-tech-server.vercel.app/api/v1/services';
+
+export interface ServiceData {
   _id?: string;
   title: string;
-  subtitle: string;
+  description: string;
   image?: string | File;  // File for upload or string for existing url
 }
 
-export const fetchBanners = async (): Promise<BannerData[]> => {
+export const fetchServices = async (): Promise<ServiceData[]> => {
   const res = await fetch(API_BASE);
   if (!res.ok) throw new Error('Failed to fetch banners');
   return res.json();
 };
 
-export const createBanner = async (data: BannerData): Promise<BannerData> => {
+export const createService = async (data: ServiceData): Promise<ServiceData> => {
     const token = await getValidToken();
   const formData = new FormData();
 
   // Send metadata as stringified JSON
   formData.append('formdata', JSON.stringify({
     title: data.title,
-    subtitle: data.subtitle,
-
+    description: data.description,
   }));
 
   // Attach the image if it's a File (not string)
   if (data.image && typeof data.image !== 'string') {
-    formData.append('BannerImage', data.image); 
+formData.append('ourServiceImage', data.image);
+ 
   }
 
 const res = await fetch(API_BASE + '/create',{
@@ -51,16 +56,17 @@ const res = await fetch(API_BASE + '/create',{
 };
 
 
-export const updateBanner = async (id: string, data: BannerData): Promise<BannerData> => {
+export const updateService = async (id: string, data: ServiceData): Promise<ServiceData> => {
         const token = await getValidToken();
   const formData = new FormData();
   formData.append('formdata', JSON.stringify({
     title: data.title,
-    subtitle: data.subtitle,
+    description: data.description,
   }));
 
   if (data.image && data.image instanceof File) {
-    formData.append('BannerImage', data.image);
+formData.append('ourServiceImage', data.image);
+
   }
 
   const res = await fetch(`${API_BASE}/${id}`, {
@@ -75,7 +81,7 @@ console.log(res, 'response from update banner service');
   return res.json();
 };
 
-export const deleteBanner = async (id: string): Promise<void> => {
+export const   deleteService = async (id: string): Promise<void> => {
             const token = await getValidToken();
   const res = await fetch(`${API_BASE}/${id}`,
      { method: 'DELETE',     

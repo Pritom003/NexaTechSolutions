@@ -9,12 +9,29 @@ import {
   MoreHorizontal,
   ChevronDown,
   ChevronUp,
+  Key,
+  Home,
 } from "lucide-react";
 import { FaUser } from "react-icons/fa";
+import Link from "next/link";
+import { useUser } from "../context/useContext";
+import { useRouter } from "next/navigation";
+
+import { deleteCookie } from "cookies-next";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [uiMenuOpen, setUiMenuOpen] = useState(false);
+  const router = useRouter();
 
+const {setUser  }=useUser()
+// console.log(user);
+  const handleLogout = () => {
+    deleteCookie('accessToken')
+    deleteCookie('refreshToken')
+    setUser(null)
+    router.push("/login");
+  }
+   
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
@@ -32,9 +49,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
         {/* Navigation */}
         <nav className="flex md:flex-col gap-4 sm:gap-6 w-full text-sm">
-          <a href="/dashboard/profile" className="flex items-center gap-2 hover:text-white transition">
+          <Link href="/dashboard/profile" className="flex items-center gap-2 hover:text-white transition">
             <User className="w-5 h-5" /> Profile
-          </a>
+          </Link>
+          <Link href="/" className="flex items-center gap-2 hover:text-white transition">
+            <Home className="w-5 h-5" /> Home
+          </Link>
 
           {/* UI Edit dropdown */}
           <div>
@@ -49,21 +69,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
             {uiMenuOpen && (
               <div className="ml-6 mt-2 flex flex-col gap-2 text-orange-400">
-                <a href="/dashboard/update-ui/update-hero" className="flex items-center gap-2 hover:text-white transition">
+                <Link href="/dashboard/admin/update-hero" className="flex items-center gap-2 hover:text-white transition">
                   <ImageIcon className="w-4 h-4" />
                   Banner
-                </a>
-                <a href="/dashboard/services" className="flex items-center gap-2 hover:text-white transition">
+                </Link>
+                <Link href="/dashboard/admin/update-service" className="flex items-center gap-2 hover:text-white transition">
                   <Hammer className="w-4 h-4" />
                   Services
-                </a>
-                <a href="/dashboard/more" className="flex items-center gap-2 hover:text-white transition">
+                </Link>
+                <Link href="/" className="flex items-center gap-2 hover:text-white transition">
                   <MoreHorizontal className="w-4 h-4" />
                   More
-                </a>
+                </Link>
               </div>
             )}
           </div>
+          <button onClick={handleLogout}className="flex items-center gap-2 hover:text-white transition">
+           <Key className="w-5 h-5" /> logout</button>
         </nav>
       </aside>
 

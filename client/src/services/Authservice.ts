@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use server";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
-import { getValidToken } from "@/app/lib/verifyToken";
-
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export const registerUserWithFormData = async (formData: FormData) => {
 
     try {

@@ -2,12 +2,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { loginUser } from '@/services/Authservice'; // adjust path
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { loginUser } from '@/services/Authservice'; // your existing function
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -17,14 +20,17 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
     const result = await loginUser(formData);
     setLoading(false);
 
     if (result?.success) {
-      // redirect or show success message
-      console.log('Login successful!');
+      toast.success('Login successful!');
+      router.push('/'); // Navigate to homepage
     } else {
-      setError(result.message || 'Login failed');
+      const errorMessage = result?.message || 'Login failed';
+      toast.error(errorMessage);
+      setError(errorMessage);
     }
   };
 
@@ -76,7 +82,7 @@ const LoginPage = () => {
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
 
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <p className="mt-4 text-center text-sm">
           Don't have an account?{' '}

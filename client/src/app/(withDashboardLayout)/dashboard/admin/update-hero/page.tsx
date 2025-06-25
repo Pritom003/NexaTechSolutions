@@ -30,6 +30,7 @@ const AdminBannerPage = () => {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false); // New state for submit button loading
 
   const { control, handleSubmit, reset, setValue, watch } = useForm<BannerData>({
     defaultValues: { title: '', subtitle: '', image: '' },
@@ -53,6 +54,7 @@ const AdminBannerPage = () => {
   }, []);
 
   const onSubmit = async (formData: BannerData) => {
+    setSubmitLoading(true);  // Start loading on submit button
     try {
       const payload: BannerData = {
         title: formData.title,
@@ -63,22 +65,22 @@ const AdminBannerPage = () => {
       let result: BannerData;
       if (editIndex !== null && banners[editIndex]._id) {
         result = await updateBanner(banners[editIndex]._id!, payload);
-        console.log(result, 'result from update banner');
         const updated = [...banners];
         updated[editIndex] = result;
         setBanners(updated);
-        message.success('Banner updated!');
+        message.success('Banner updated successfully!');
       } else {
         result = await createBanner(payload);
-        console.log(result, 'result from create banner');
         setBanners(prev => [...prev, result]);
-        message.success('Banner created!');
+        message.success('Banner created successfully!');
       }
 
       handleModalClose();
     } catch (error) {
       console.error(error);
       message.error('Failed to submit banner');
+    } finally {
+      setSubmitLoading(false);  // Stop loading on submit button
     }
   };
 
@@ -209,7 +211,7 @@ const AdminBannerPage = () => {
             )}
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" block>
+          <Button type="primary" htmlType="submit" block loading={submitLoading} disabled={submitLoading}>
             {editIndex !== null ? 'Update Banner' : 'Create Banner'}
           </Button>
         </Form>

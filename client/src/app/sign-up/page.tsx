@@ -4,56 +4,52 @@
 import React, { useState } from 'react';
 import { registerUserWithFormData } from '@/services/Authservice';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const SignupPage = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
   });
 
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setError('');
-  setSuccessMessage('');
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const userData = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-     
-    };
+    try {
+      const userData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      };
 
-    const formdata = new FormData();
-    formdata.append('formdata', JSON.stringify(userData));
+      const formdata = new FormData();
+      formdata.append('formdata', JSON.stringify(userData));
 
-    // Optional: debug log
-    for (const [key, value] of formdata.entries()) {
-      console.log(`${key}: ${value}`);
+      const result = await registerUserWithFormData(formdata);
+      setLoading(false);
+
+      if (result?.success) {
+        toast.success('Account created successfully!');
+        router.push('/');
+      } else {
+        toast.error(result?.message || 'Something went wrong');
+      }
+    } catch (err) {
+      toast.error('Failed to register. Please try again.');
+      setLoading(false);
     }
-
-    const result = await registerUserWithFormData(formdata);
-    console.log(result);
-
-    if (result?.success) {
-      setSuccessMessage('Account created successfully!');
-    } else {
-      setError(result?.message || 'Something went wrong');
-    }
-  } catch (err) {
-    setError('Failed to register. Please try again.');
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -62,8 +58,6 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 w-full max-w-sm"
       >
         <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
-
-      
 
         <div className="mb-4">
           <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
@@ -115,12 +109,12 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
         <button
           type="submit"
+          disabled={loading}
           className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded w-full"
         >
-          Register
+          {loading ? 'Registering...' : 'Register'}
         </button>
-  {error && <p className="text-red-500 mb-4">{error}</p>}
-        {successMessage && <p className="text-green-600 mb-4">{successMessage}</p>}
+
         <p className="mt-4 text-center text-sm">
           Already have an account?{' '}
           <Link href="/login" className="text-blue-500 hover:underline">

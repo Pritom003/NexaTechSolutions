@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -6,6 +7,7 @@ import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { fetchServices } from "@/services/ServiceApis";
 // import "./services-slider.css"; // optional for custom hover styles
 
 type Service = {
@@ -18,12 +20,24 @@ type Service = {
 const ServicesSlider = () => {
   const [services, setServices] = useState<Service[]>([]);
 
-  useEffect(() => {
-    fetch("/api/services")
-      .then((res) => res.json())
-      .then((data) => setServices(data));
-  }, []);
 
+ useEffect(() => {
+    (async () => {
+      try {
+        const data = await fetchServices();
+        setServices(
+          data.map((service: any) => ({
+            _id: service._id,
+            title: service.title,
+            description: service.subtitle,
+            image: typeof service.image === "string" ? service.image : ""
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      }
+    })();
+  }, []);
   return (
     <section className="py-16 px-6 md:px-20 bg-white text-gray-900">
       <div className="text-center mb-12">

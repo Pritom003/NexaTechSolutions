@@ -10,7 +10,7 @@ import sendResponse from '../../utils/sendResponse';
 const register = CatchAsync(async (req: Request, res: Response) => {
 
 const data = JSON.parse(req.body.formdata); 
-console.log(data, 'from controller');
+// console.log(data, 'from controller');
 const result = await AuthService.register(data);
   sendResponse(res, {
     statusCode: 201,
@@ -21,7 +21,7 @@ const result = await AuthService.register(data);
 });
 
 const login = CatchAsync(async (req: Request, res: Response) => {
-    console.log(req);
+    // console.log(req);
   const result = await AuthService.login(req.body);
 
   sendResponse(res, {

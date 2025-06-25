@@ -11,13 +11,27 @@ const app: Application = express();
 app.use(express.json());
 app.use(cookieParser())
 
-const allowedOrigins = ['http://localhost:3000' ]; 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://nexa-tech-delta.vercel.app',
+  'https://nexa-tech-server.vercel.app',
+];
 
 app.use(
   cors({
-    origin: allowedOrigins,
-    credentials: true, 
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
+    origin: (origin, callback) => {
+      if (!origin) {
+        // For non-browser clients like Postman or curl, allow requests
+        return callback(null, true);
+      }
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );

@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 
 import { Bebas_Neue, Roboto_Condensed } from "next/font/google";
 import "./globals.css";
+import Providers from "./provider/provider";
+
+// import Providers from "./provider/provider";
 
 
 const bebasNeue = Bebas_Neue({
@@ -31,7 +34,10 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`max-w-[2100px] mx-auto ${bebasNeue.variable} ${robotoCondensed.variable} font-sans`}>
-        {children}
+        <Providers>
+  {children}
+        </Providers>
+      
       </body>
     </html>
   );
