@@ -2,23 +2,21 @@ import { uploadToCloudinary } from "../../utils/uploadImagetocloudenary";
 
 import { IOurService, ourService } from "./ourservice.model";
 
-export const createourService = async (data: IOurService, files: any) => {
-  if (files && files.ourServiceImage && files.ourServiceImage[0]) {
-    const file = files.ourServiceImage[0];
-    const result = await uploadToCloudinary(
-      file.buffer,
-      `ourService_${Date.now()}`,
-      file.mimetype
-    ) as { secure_url: string };
-
-    const ourServiceImageUrl = result.secure_url;
-    data.image = ourServiceImageUrl || '';
+export const createourService = async (
+  data: any,
+  files?: { [fieldname: string]: Express.Multer.File[] }
+): Promise<IOurService> => {
+  if (files && files.ourServiceImage?.length) {
+    const imageBuffer = files.ourServiceImage[0].buffer;
+    const mimetype = files.ourServiceImage[0].mimetype;
+    const uploaded = await uploadToCloudinary(imageBuffer, `ourService-${Date.now()}`, mimetype);
+    data.image = uploaded.secure_url;
   }
 
-  const result = await ourService.create(data);
-  return result;
+  // Save to DB (replace with your actual model logic)
+  const newService = await  ourService.create(data);
+  return newService;
 };
-
 
 export const getourServices = async () => {
   return await ourService.find();
@@ -28,17 +26,20 @@ export const getSingleourService = async (id: string) => {
   return await ourService.findById(id);
 };
 
-export const updateourServiceWithImage = async (id: string, data: Partial<IOurService>, files: any) => {
-  if (files && files.ourServiceImage && files.ourServiceImage[0]) {
-    const file = files.ourServiceImage[0];
-    const result = await uploadToCloudinary(
-      file.buffer,
-      `ourService_${Date.now()}`,
-      file.mimetype
-    ) as { secure_url: string };
-    data.image = result.secure_url;
+export const updateourService = async (
+  id: string,
+  data: any,
+  files?: { [fieldname: string]: Express.Multer.File[] }
+): Promise<IOurService | null> => {
+  if (files && files.ourServiceImage?.length) {
+    const imageBuffer = files.ourServiceImage[0].buffer;
+    const mimetype = files.ourServiceImage[0].mimetype;
+    const uploaded = await uploadToCloudinary(imageBuffer, `ourService-${Date.now()}`, mimetype);
+    data.image = uploaded.secure_url;
   }
-  return await ourService.findByIdAndUpdate(id, data, { new: true });
+
+  const updated = await ourService.findByIdAndUpdate(id, data, { new: true });
+  return updated;
 };
 
 

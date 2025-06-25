@@ -8,7 +8,9 @@ import globalErrorHandler from './app/error/globalErrorHandler';
 const app: Application = express();
 
 // Middleware to parse JSON and handle CORS
-app.use(express.json());
+app.use(express.json({ limit: '90mb' }));
+app.use(express.urlencoded({ extended: true, limit: '90mb' }));
+
 app.use(cookieParser())
 
 const allowedOrigins = [

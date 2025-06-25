@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import sendResponse from "../../utils/sendResponse";
 import CatchAsync from "../../utils/fetch.async";
 import mongoose from "mongoose";
-import { createourService, deleteourService, getourServices, updateourServiceWithImage } from "./ourservice.service";
+import { createourService, deleteourService, getourServices, updateourService } from "./ourservice.service";
 
 export const createBanner = CatchAsync(async (req: Request, res: Response) => {
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
- const data = JSON.parse(req.body.formdata); 
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+const data = JSON.parse(req.body.formdata); 
 // const data =req
 
 // console.log(data ,files , "data i am receriving from postman as formdata");
@@ -26,10 +26,10 @@ export const getAll = async (_req: Request, res: Response) => {
 
 
 export const update = CatchAsync(async (req: Request, res: Response) => {
-  const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
-  const data = JSON.parse(req.body.formdata);
+const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+const data = JSON.parse(req.body.formdata);
 
-  const service = await updateourServiceWithImage(req.params.id, data, files);
+  const service = await updateourService(req.params.id, data, files);
 
   if (!service) {
     res.status(404).json({ message: "service not found" });
