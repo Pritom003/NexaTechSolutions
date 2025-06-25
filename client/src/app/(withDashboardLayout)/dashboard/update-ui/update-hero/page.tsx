@@ -22,88 +22,100 @@ import {
   EditOutlined,
 } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
-
-interface BannerData {
-  _id?: string;
-  title: string;
-  subtitle: string;
-  image: string;
-}
-
-const API_BASE = 'http://localhost:5000/api/banner';
+import { BannerData, createBanner, deleteBanner, fetchBanners, updateBanner } from '@/services/BannerServices';
 
 const AdminBannerPage = () => {
   const [banners, setBanners] = useState<BannerData[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const { control, handleSubmit, setValue, watch, reset } = useForm<BannerData>({
+  const { control, handleSubmit, reset, setValue, watch } = useForm<BannerData>({
     defaultValues: { title: '', subtitle: '', image: '' },
   });
 
-  const image = watch('image');
-
-  // Fetch Banners
-  const fetchBanners = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(API_BASE);
-      const data = await res.json();
-      setBanners(data);
-    } catch (err) {
-      message.error('Failed to load banners');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const previewImage = watch('image');
 
   useEffect(() => {
-    fetchBanners();
+    const load = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchBanners();
+        setBanners(data);
+      } catch (error) {
+        message.error('Failed to load banners');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
-  // Create or Update Banner
-  const onSubmit = async (data: BannerData) => {
+  const onSubmit = async (formData: BannerData) => {
     try {
-      const isEdit = editIndex !== null;
-      const url = isEdit ? `${API_BASE}/${banners[editIndex]._id}` : API_BASE;
-      const method = isEdit ? 'PUT' : 'POST';
+      const payload: BannerData = {
+        title: formData.title,
+        subtitle: formData.subtitle,
+        image: imageFile || formData.image,
+      };
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) throw new Error('Network error');
-      const result = await res.json();
-
-      if (isEdit) {
+      let result: BannerData;
+      if (editIndex !== null && banners[editIndex]._id) {
+        result = await updateBanner(banners[editIndex]._id!, payload);
+        console.log(result, 'result from update banner');
         const updated = [...banners];
         updated[editIndex] = result;
         setBanners(updated);
         message.success('Banner updated!');
       } else {
+        result = await createBanner(payload);
+        console.log(result, 'result from create banner');
         setBanners(prev => [...prev, result]);
         message.success('Banner created!');
       }
 
-      setIsModalOpen(false);
-    } catch (err) {
-      console.error(err);
+      handleModalClose();
+    } catch (error) {
+      console.error(error);
       message.error('Failed to submit banner');
     }
   };
 
-  // Delete Banner
-  const handleDelete = async (index: number) => {
-    try {
-      const id = banners[index]._id;
-      const res = await fetch(`${API_BASE}/${id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error('Delete failed');
+  const handleImageUpload = (file: File) => {
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setValue('image', reader.result as string); // for preview
+    };
+    reader.readAsDataURL(file);
+    return false;
+  };
 
+  const handleEdit = (index: number) => {
+    const selected = banners[index];
+    reset({
+      title: selected.title,
+      subtitle: selected.subtitle,
+      image: selected.image,
+    });
+    setImageFile(null);
+    setEditIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    reset({ title: '', subtitle: '', image: '' });
+    setImageFile(null);
+    setEditIndex(null);
+  };
+
+  const handleDelete = async (index: number) => {
+    const id = banners[index]._id;
+    if (!id) return;
+    try {
+      await deleteBanner(id);
       setBanners(prev => prev.filter((_, i) => i !== index));
       message.success('Banner deleted!');
     } catch (err) {
@@ -112,35 +124,11 @@ const AdminBannerPage = () => {
     }
   };
 
-  // Image Upload (Base64)
-  const handleImageUpload = (file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setValue('image', reader.result as string);
-    };
-    reader.readAsDataURL(file);
-    return false;
-  };
-
-  // Open Modal for Create
-  const openCreateModal = () => {
-    reset({ title: '', subtitle: '', image: '' });
-    setEditIndex(null);
-    setIsModalOpen(true);
-  };
-
-  // Open Modal for Edit
-  const handleEdit = (index: number) => {
-    reset(banners[index]);
-    setEditIndex(index);
-    setIsModalOpen(true);
-  };
-
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Manage Banners</h2>
-        <Button icon={<PlusOutlined />} type="primary" onClick={openCreateModal}>
+        <Button icon={<PlusOutlined />} type="primary" onClick={() => setIsModalOpen(true)}>
           Add Banner
         </Button>
       </div>
@@ -151,9 +139,10 @@ const AdminBannerPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {banners.map((banner, index) => (
             <Card
+              key={banner._id}
               cover={
                 <Image
-                  src={banner.image}
+                  src={typeof banner.image === 'string' ? banner.image : ''}
                   alt="banner"
                   width={400}
                   height={192}
@@ -180,10 +169,9 @@ const AdminBannerPage = () => {
         </div>
       )}
 
-      {/* Modal */}
       <Modal
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={handleModalClose}
         footer={null}
         title={editIndex !== null ? 'Edit Banner' : 'Add New Banner'}
         destroyOnClose
@@ -205,20 +193,24 @@ const AdminBannerPage = () => {
               showUploadList={false}
               accept="image/*"
             >
-              <Button icon={<UploadOutlined />}>Upload</Button>
+              <Button icon={<UploadOutlined />}>Upload Image</Button>
             </Upload>
-            {image && (
-              <img
-                src={image}
-                alt="preview"
+
+            {previewImage && typeof previewImage === 'string' && (
+              <Image
+                src={previewImage}
+                alt="Preview"
                 className="mt-3 rounded-md"
-                style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                width={400}
+                height={200}
+                style={{ width: '100%', height: 200, objectFit: 'cover' }}
+                unoptimized
               />
             )}
           </Form.Item>
 
           <Button type="primary" htmlType="submit" block>
-            {editIndex !== null ? 'Save Changes' : 'Create Banner'}
+            {editIndex !== null ? 'Update Banner' : 'Create Banner'}
           </Button>
         </Form>
       </Modal>

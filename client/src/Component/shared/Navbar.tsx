@@ -32,9 +32,10 @@ const Navbar = () => {
           text-white border border-white rounded-full items-center md:px-6 space-x-6"
       >
         <Link href="/" className="hover:underline">Home</Link>
-        <Link href="/about" className="hover:underline">About</Link>
+
         <Link href="/dashboard" className="hover:underline">dashboard</Link>
         <Link href="/contact" className="hover:underline">Contact</Link>
+                <Link href="/login" className="hover:underline">Login</Link>
       </motion.div>
 
       {/* Mobile Burger Icon */}
@@ -55,9 +56,10 @@ const Navbar = () => {
             className="absolute top-20 right-8 w-48 bg-orange-500 text-white border border-white rounded-2xl p-4 flex flex-col gap-4 md:hidden z-30"
           >
             <Link href="/" onClick={() => setIsOpen(false)} className="hover:underline">Home</Link>
-            <Link href="/about" onClick={() => setIsOpen(false)} className="hover:underline">About</Link>
+     
             <Link href="/dashboard" onClick={() => setIsOpen(false)} className="hover:underline">dashboard</Link>
             <Link href="/contact" onClick={() => setIsOpen(false)} className="hover:underline">Contact</Link>
+                   <Link href="/login" onClick={() => setIsOpen(false)} className="hover:underline">Login</Link>
           </motion.div>
         )}
       </AnimatePresence>

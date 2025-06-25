@@ -1,21 +1,22 @@
-// GET
-const res = await fetch('http://localhost:5000/api/banner');
+import { NextResponse } from "next/server";
 
-// POST
-await fetch('http://localhost:5000/api/banner', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(newBanner),
-});
-
-// PUT
-await fetch(`http://localhost:5000/api/banner/${id}`, {
-  method: 'PUT',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(updatedBanner),
-});
-
-// DELETE
-await fetch(`http://localhost:5000/api/banner/${id}`, {
-  method: 'DELETE',
-});
+export async function GET() {
+  const data = [
+    {
+      title: "Web Development",
+      subtitle: "Building fast, responsive, modern websites.",
+      image: "/Images/3496219.jpg",
+    },
+    {
+      title: "Mobile App Design",
+      subtitle: "Crafting intuitive mobile experiences.",
+      image:  "/Images/mobile.png",
+    },
+    {
+      title: "SEO Optimization",
+      subtitle: "Helping your business rank on search engines.",
+      image:  "/Images/Screenshot 2025-06-24 185313.png",
+    },
+  ];
+  return NextResponse.json(data);
+}
