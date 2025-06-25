@@ -8,7 +8,6 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { fetchServices } from "@/services/ServiceApis";
-// import "./services-slider.css"; // optional for custom hover styles
 
 type Service = {
   _id: string;
@@ -20,8 +19,7 @@ type Service = {
 const ServicesSlider = () => {
   const [services, setServices] = useState<Service[]>([]);
 
-
- useEffect(() => {
+  useEffect(() => {
     (async () => {
       try {
         const data = await fetchServices();
@@ -29,8 +27,8 @@ const ServicesSlider = () => {
           data.map((service: any) => ({
             _id: service._id,
             title: service.title,
-            description: service.subtitle,
-            image: typeof service.image === "string" ? service.image : ""
+            description: service.description,
+            image: typeof service.image === "string" ? service.image : "",
           }))
         );
       } catch (error) {
@@ -38,6 +36,7 @@ const ServicesSlider = () => {
       }
     })();
   }, []);
+
   return (
     <section className="py-16 px-6 md:px-20 bg-white text-gray-900">
       <div className="text-center mb-12">
@@ -57,7 +56,7 @@ const ServicesSlider = () => {
         }}
         autoplay={{ delay: 4000, disableOnInteraction: false }}
         navigation
-        pagination={{ clickable: true }}
+        pagination={{ clickable: true, el: ".custom-swiper-pagination" }}
       >
         {services.map((service) => (
           <SwiperSlide key={service._id}>
@@ -70,26 +69,32 @@ const ServicesSlider = () => {
               }}
             >
               {/* Orange overlay */}
-              <div className="absolute inset-0
-               bg-orange-500/40 transition-opacity
-                group-hover:bg-orange-300/30"></div>
+              <div className="absolute inset-0 bg-orange-500/40 transition-opacity group-hover:bg-orange-300/30" />
 
-              {/* Title (bottom) */}
-              <div className="absolute bottom-0 left-0 w-full text-white p-4 text-xl font-bold z-10 bg-black/40 group-hover:bg-black/70 transition">
-                {service.title}
-              </div>
+              {/* Bottom content container */}
+              <div className="absolute bottom-0 left-0 w-full p-4 z-10 bg-black/40 group-hover:bg-black/70 transition-all">
+                {/* Title */}
+                <h3 className="text-white text-xl font-bold transition-transform duration-300 group-hover:-translate-y-4">
+                  {service.title}
+                </h3>
 
-              {/* Hover content */}
-              <div className="absolute inset-0 text-white p-4 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center z-20">
-                <p className="mb-3 text-sm">{service.description}</p>
-                <button className="mt-2 px-4 py-2 border border-white text-sm rounded-full hover:bg-white hover:text-orange-600 transition">
-                  View Details
+                {/* Description appears on hover */}
+                <p className="text-sm text-white mt-2 opacity-0 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-24 transition-all duration-300 line-clamp-3">
+                  {service.description}
+                </p>
+
+                {/* More button */}
+                <button className="text-white mt-2 text-xs underline opacity-0 group-hover:opacity-100 transition duration-300">
+                  Read more...
                 </button>
               </div>
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
+
+      {/* Dots below the slider */}
+      <div className="custom-swiper-pagination mt-6 flex justify-center space-x-2" />
     </section>
   );
 };

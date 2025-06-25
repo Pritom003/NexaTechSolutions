@@ -24,13 +24,13 @@ const {user ,setUser ,isLoading }=useUser()
 
 
   return (
-    <div className="absolute top-10 left-8 right-8 flex justify-between items-center h-16 z-20">
+    <div className="absolute top-8 left-8 right-8 flex justify-between items-center h-16 z-20">
       {/* Logo */}
       <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="w-1/5 bg-black/70 text-white rounded-r-2xl flex items-center px-4"
+        className="md:w-1/5 min-w-44 p-2 bg-black/70 text-white rounded-r-2xl flex items-center px-4"
       >
         <Image src={lgogo} alt="Logo" width={50} height={50} className="mr-2" />
         <span className="text-xl font-bold tracking-wider">NexaTech</span>
@@ -44,9 +44,9 @@ const {user ,setUser ,isLoading }=useUser()
         className="hidden md:flex bg-black px-4 py-2 text-white border border-white rounded-full items-center md:px-6 space-x-6"
       >
         <Link href="/" className="hover:underline">Home</Link>
-        {!isLoading && user && (
+       
           <Link href="/dashboard" className="hover:underline">Dashboard</Link>
-        )}
+       
         <Link href="/contact" className="hover:underline">Contact</Link>
         {!isLoading && !user ? (
           <Link href="/login" className="hover:underline">Login</Link>
@@ -56,9 +56,10 @@ const {user ,setUser ,isLoading }=useUser()
       </motion.div>
 
       {/* Mobile Menu Icon */}
-      <div className="md:hidden">
+      <div className="md:hidden ">
         <button onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X className="text-white" /> : <Menu className="text-white" />}
+          {isOpen ? <X className="text-white" /> : 
+          <Menu size={40} className="text-white rounded-xl bg-black p-2" />}
         </button>
       </div>
 
@@ -73,9 +74,9 @@ const {user ,setUser ,isLoading }=useUser()
             className="absolute top-20 right-8 w-48 bg-orange-500 text-white border border-white rounded-2xl p-4 flex flex-col gap-4 md:hidden z-30"
           >
             <Link href="/" onClick={() => setIsOpen(false)} className="hover:underline">Home</Link>
-            {!isLoading && user && (
+           
               <Link href="/dashboard" onClick={() => setIsOpen(false)} className="hover:underline">Dashboard</Link>
-            )}
+         
             <Link href="/contact" onClick={() => setIsOpen(false)} className="hover:underline">Contact</Link>
             {!isLoading && !user ? (
               <Link href="/login" onClick={() => setIsOpen(false)} className="hover:underline">Login</Link>

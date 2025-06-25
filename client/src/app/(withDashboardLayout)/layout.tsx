@@ -11,6 +11,7 @@ import {
   ChevronUp,
   Key,
   Home,
+  MessageCircle,
 } from "lucide-react";
 import { FaUser } from "react-icons/fa";
 import Link from "next/link";
@@ -33,7 +34,7 @@ const {setUser  }=useUser()
   }
    
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
+    <div className="min-h-screen  md:h-screen md:overflow-hidden flex flex-col md:flex-row">
       {/* Sidebar */}
       <aside className="bg-black text-orange-500
        w-full md:max-w-44 md:h-screen flex md:flex-col items-center md:items-start px-4 py-6 space-y-6">
@@ -49,7 +50,7 @@ const {setUser  }=useUser()
 
         {/* Navigation */}
         <nav className="flex md:flex-col gap-4 sm:gap-6 w-full text-sm">
-          <Link href="/dashboard/profile" className="flex items-center gap-2 hover:text-white transition">
+          <Link href="/dashboard" className="flex items-center gap-2 hover:text-white transition">
             <User className="w-5 h-5" /> Profile
           </Link>
           <Link href="/" className="flex items-center gap-2 hover:text-white transition">
@@ -83,14 +84,19 @@ const {setUser  }=useUser()
                 </Link>
               </div>
             )}
+             
           </div>
+          <Link href="/dashboard/admin/contact-message" className="flex items-center gap-2 hover:text-white transition">
+                  <MessageCircle className="w-4 h-4" />
+                  Contact Messages
+                </Link>
           <button onClick={handleLogout}className="flex items-center gap-2 hover:text-white transition">
            <Key className="w-5 h-5" /> logout</button>
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 bg-gray-50 p-6">{children}</main>
+      <main className="flex-1 overflow-y-auto bg-gray-50 p-6 h-full">{children}</main>
     </div>
   );
 };

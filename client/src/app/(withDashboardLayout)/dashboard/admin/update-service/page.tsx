@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/jsx-key */
 'use client';
@@ -29,6 +30,7 @@ import {
   fetchServices,
   updateService,
 } from '@/services/ServiceApis';
+import toast from 'react-hot-toast';
 
 const AdminServicePage = () => {
   const [services, setServices] = useState<ServiceData[]>([]);
@@ -36,7 +38,8 @@ const AdminServicePage = () => {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const { control, handleSubmit, reset, setValue, watch } = useForm<ServiceData>({
     defaultValues: { title: '', description: '', image: '' },
   });
@@ -53,49 +56,55 @@ const AdminServicePage = () => {
         message.error('Failed to load services');
       } finally {
         setLoading(false);
+        
       }
     };
     load();
   }, []);
 
-  const onSubmit = async (formData: ServiceData) => {
-    try {
-      const payload: ServiceData = {
-        title: formData.title,
-        description: formData.description,
-        image: imageFile || formData.image,
-      };
+const onSubmit = async (formData: ServiceData) => {
+  setSubmitLoading(true);
+  try {
+    const payload: ServiceData = {
+      title: formData.title,
+      description: formData.description,
+      image: imageFile || formData.image,
+    };
 
-      let result: ServiceData;
-      if (editIndex !== null && services[editIndex]._id) {
-        result = await updateService(services[editIndex]._id!, payload);
-        const updated = [...services];
-        updated[editIndex] = result;
-        setServices(updated);
-        message.success('Service updated!');
-      } else {
-        result = await createService(payload);
-        setServices(prev => [...prev, result]);
-        message.success('Service created!');
-      }
-
-      handleModalClose();
-    } catch (error) {
-      console.error(error);
-      message.error('Failed to submit service');
+    let result: ServiceData;
+    if (editIndex !== null && services[editIndex]._id) {
+      result = await updateService(services[editIndex]._id!, payload);
+      const updated = [...services];
+      updated[editIndex] = result;
+      setServices(updated);
+      toast.success('✅ Service updated successfully!');
+    } else {
+      result = await createService(payload);
+      setServices(prev => [...prev, result]);
+      message.success('✅ Service created successfully!');
     }
-  };
 
+    handleModalClose();
+  } catch (error: any) {
+    console.error(error);
+
+    if (error?.response?.status === 413) {
+      toast.error('❌ Image too large. Please upload a smaller file (max ~5MB).');
+    } else {
+   toast.error('❌ Image too large. Please upload a smaller file (max ~5MB).');
+    }
+  }finally {
+    setSubmitLoading(false); // Stop loading
+  }
+};
+ 
+
+ 
   const handleImageUpload = (file: File) => {
     setImageFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setValue('image', reader.result as string);
-    };
-    reader.readAsDataURL(file);
-    return false;
+    setImagePreviewUrl(URL.createObjectURL(file));
+    return false; // Prevent automatic upload
   };
-
   const handleEdit = (index: number) => {
     const selected = services[index];
     reset({
@@ -200,9 +209,9 @@ const AdminServicePage = () => {
               <Button icon={<UploadOutlined />}>Upload Image</Button>
             </Upload>
 
-            {previewImage && typeof previewImage === 'string' && (
+        {imagePreviewUrl && (
               <Image
-                src={previewImage}
+                src={imagePreviewUrl}
                 alt="Preview"
                 className="mt-3 rounded-md"
                 width={400}
@@ -210,10 +219,11 @@ const AdminServicePage = () => {
                 style={{ width: '100%', height: 200, objectFit: 'cover' }}
                 unoptimized
               />
+            
             )}
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" block>
+          <Button type="primary" htmlType="submit" block  loading={submitLoading} disabled={submitLoading}>
             {editIndex !== null ? 'Update Service' : 'Create Service'}
           </Button>
         </Form>

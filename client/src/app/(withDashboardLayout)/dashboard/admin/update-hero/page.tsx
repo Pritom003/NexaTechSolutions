@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/jsx-key */
 'use client';
@@ -23,6 +24,7 @@ import {
 } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import { BannerData, createBanner, deleteBanner, fetchBanners, updateBanner } from '@/services/BannerServices';
+import toast from 'react-hot-toast';
 
 const AdminBannerPage = () => {
   const [banners, setBanners] = useState<BannerData[]>([]);
@@ -54,35 +56,42 @@ const AdminBannerPage = () => {
   }, []);
 
   const onSubmit = async (formData: BannerData) => {
-    setSubmitLoading(true);  // Start loading on submit button
-    try {
-      const payload: BannerData = {
-        title: formData.title,
-        subtitle: formData.subtitle,
-        image: imageFile || formData.image,
-      };
+  setSubmitLoading(true); // Start loading on submit button
+  try {
+    const payload: BannerData = {
+      title: formData.title,
+      subtitle: formData.subtitle,
+      image: imageFile || formData.image,
+    };
 
-      let result: BannerData;
-      if (editIndex !== null && banners[editIndex]._id) {
-        result = await updateBanner(banners[editIndex]._id!, payload);
-        const updated = [...banners];
-        updated[editIndex] = result;
-        setBanners(updated);
-        message.success('Banner updated successfully!');
-      } else {
-        result = await createBanner(payload);
-        setBanners(prev => [...prev, result]);
-        message.success('Banner created successfully!');
-      }
+    let result: BannerData;
 
-      handleModalClose();
-    } catch (error) {
-      console.error(error);
-      message.error('Failed to submit banner');
-    } finally {
-      setSubmitLoading(false);  // Stop loading on submit button
+    if (editIndex !== null && banners[editIndex]._id) {
+      result = await updateBanner(banners[editIndex]._id!, payload);
+      const updated = [...banners];
+      updated[editIndex] = result;
+      setBanners(updated);
+    toast.success('✅ Banner updated successfully!');
+    } else {
+      result = await createBanner(payload);
+      setBanners(prev => [...prev, result]);
+    toast.success('✅ Banner updated successfully!');
     }
-  };
+
+    handleModalClose();
+  } catch (error: any) {
+    console.error(error);
+
+    if (error?.response?.status === 413) {
+      message.error('❌ Image too large. Please upload a smaller file (max ~5MB).');
+    } else {
+       toast.error('❌ Image too large. Please upload a smaller file (max ~5MB).');
+    }
+  } finally {
+    setSubmitLoading(false); // Stop loading
+  }
+};
+
 
   const handleImageUpload = (file: File) => {
     setImageFile(file);

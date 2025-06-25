@@ -59,7 +59,7 @@ export default function Hero() {
             exit={{ opacity: 0, x: 30 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="lg:text-8xl sm:text-5xl xs:text-3xl font-bebas text-orange-500 mb-4 xs:mb-0">
+            <h1 className="lg:text-8xl md:text-7xl sm:text-5xl xs:text-3xl font-bebas text-orange-500 mb-4 xs:mb-0">
               {current.title}
             </h1>
             <p className="sm:text-lg md:text-xl xs:text-xs font-robotoCondensed">

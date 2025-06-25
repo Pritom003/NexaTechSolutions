@@ -24,4 +24,10 @@ export default {
     cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
     cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
 
+    emailjs_service_id: process.env.EMAILJS_SERVICE_ID,
+emailjs_template_id: process.env.EMAILJS_TEMPLATE_ID,
+emailjs_public_key: process.env.EMAILJS_PUBLIC_KEY,
+emailjs_private_key: process.env.EMAILJS_PRIVATE_KEY,
+
+
 };
